@@ -14,7 +14,7 @@
     "ilp-exchange-rate": "^0.1.1",
     "ilp-plugin": "^3.3.1",
     "ilp-protocol-ildcp": "^2.0.1",
-    "ilp-protocol-spsp": "^2.2.0",
+    "ilp-protocol-spsp": "^3.0.0",
     "log-symbols": "^3.0.0",
     "node-fetch": "^2.6.0",
     "reduct": "^3.3.1"
