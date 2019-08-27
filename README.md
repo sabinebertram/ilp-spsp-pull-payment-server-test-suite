@@ -20,7 +20,7 @@ Additionally, there is a `run()` function that runs all of the above, more speci
 * `testExpiry ()`
 
 ## Usage
-First, connect to the network and have an instance of the ILP SPSP Pull Payment Server running. To run the entire test suite, run
+First, start [moneyd](https://github.com/interledgerjs/moneyd) and have an instance of the [ILP SPSP Pull Payment Server](https://github.com/sabinebertram/ilp-spsp-pull-payment-server) running. To run the entire test suite, run
 ```sh
 SPSP_SERVER_URL=<YOUR_URL> SPSP_AUTH_TOKEN=<YOUR_TOKEN> PRODUCTION=<true/false> npm start
 ```
