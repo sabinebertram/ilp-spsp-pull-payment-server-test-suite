@@ -1,14 +1,14 @@
 const SPSP = require('ilp-protocol-spsp')
 const ILDCP = require('ilp-protocol-ildcp')
 const Exchange = require('ilp-exchange-rate')
+const IlpPlugin = require('ilp-plugin')
 
-const Config = require('./config')
 const PullFunctions = require('./pullfunctions')
 const Helpers = require('./helpers')
 
 class PullTestSuite {
   constructor (deps) {
-    this.config = deps(Config)
+    this.plugin = IlpPlugin()
     this.pull = deps(PullFunctions)
     this.helpers = deps(Helpers)
     return (async () => {
@@ -18,8 +18,8 @@ class PullTestSuite {
   }
 
   async setup () {
-    await this.config.plugin.connect()
-    this.details = await ILDCP.fetch(this.config.plugin.sendData.bind(this.config.plugin))
+    await this.plugin.connect()
+    this.details = await ILDCP.fetch(this.plugin.sendData.bind(this.plugin))
     this.assetCode = this.details.assetCode
     this.assetScale = String(this.details.assetScale - 1)
     this.foreignAssetCode = this.assetCode !== 'EUR' ? 'EUR' : 'USD'
