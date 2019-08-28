@@ -1,4 +1,4 @@
-const fetch = require('node-fetch')
+const axios = require('axios')
 const SPSP = require('ilp-protocol-spsp')
 const IlpPlugin = require('ilp-plugin')
 
@@ -24,16 +24,16 @@ class PullFunctions {
 
   async createPointer (body) {
     try {
-      let response = await fetch(this.config.url, {
-        method: 'POST',
+      const response = await axios({
+        url: this.config.url,
+        method: 'post',
+        data: JSON.stringify(body),
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer ' + this.config.token
-        },
-        body: JSON.stringify(body)
+        }
       })
-      let json = await response.json()
-      return json
+      return response.data
     } catch (err) {
       return err
     }
@@ -54,10 +54,10 @@ class PullFunctions {
   }
 
   async pullMultipleIntervals (pointer, amount, n) {
-    let pulled = await this.pull(pointer, amount)
+    const pulled = await this.pull(pointer, amount)
     let totalReceived = Number(pulled.totalReceived)
     if (!totalReceived) {
-      return { totalReceive: 0, message: pulled.message }
+      return { totalReceived: 0, message: pulled.message }
     } else {
       for (let i = 1; i < n; i++) {
         await this.helpers.sleep(10000)

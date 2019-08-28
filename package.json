@@ -10,13 +10,13 @@
   "author": "Sabine Bertram",
   "license": "Apache-2.0",
   "dependencies": {
+    "axios": "^0.19.0",
     "chalk": "^2.4.2",
     "ilp-exchange-rate": "^0.1.1",
     "ilp-plugin": "^3.3.1",
     "ilp-protocol-ildcp": "^2.0.1",
     "ilp-protocol-spsp": "^3.0.0",
     "log-symbols": "^3.0.0",
-    "node-fetch": "^2.6.0",
     "reduct": "^3.3.1"
   },
   "devDependencies": {
