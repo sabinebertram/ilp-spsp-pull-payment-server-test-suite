@@ -43,18 +43,21 @@ class PullFunctions {
   }
 
   async pullMultipleIntervals (pointer, amount, intervalCount) {
-    const pulled = await this.pull(pointer, amount)
-    let totalReceived = Number(pulled.totalReceived)
-    if (!totalReceived) {
-      return { totalReceived: 0, message: pulled.message }
-    } else {
-      for (let i = 1; i < intervalCount; i++) {
-        await this.helpers.sleep(10000)
-        let pulled = await this.pull(pointer, amount)
+    let totalReceived = 0
+    let i = 0
+    while (i < intervalCount) {
+      const pulled = await this.pull(pointer, amount)
+      if (!pulled.totalReceived) {
+        return { totalReceived: totalReceived, message: pulled.message }
+      } else {
         totalReceived += Number(pulled.totalReceived)
+        i++
+        if (i < intervalCount) {
+          await this.helpers.sleep(10000)
+        }
       }
-      return { totalReceived, message: pulled.message }
     }
+    return { totalReceived }
   }
 }
 
