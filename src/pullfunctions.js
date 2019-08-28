@@ -11,17 +11,6 @@ class PullFunctions {
     this.helpers = deps(Helpers)
   }
 
-  createBody (amount, assetCode, assetScale, interval, cycles, cap) {
-    return {
-      amount,
-      assetCode,
-      assetScale,
-      interval,
-      cycles,
-      cap
-    }
-  }
-
   async createPointer (body) {
     try {
       const response = await axios({
