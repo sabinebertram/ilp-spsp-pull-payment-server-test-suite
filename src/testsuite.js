@@ -11,10 +11,6 @@ class PullTestSuite {
     this.plugin = IlpPlugin()
     this.pull = deps(PullFunctions)
     this.helpers = deps(Helpers)
-    return (async () => {
-      await this.setup()
-      return this
-    })()
   }
 
   async setup () {
@@ -171,6 +167,7 @@ class PullTestSuite {
   }
 
   async run () {
+    await this.setup()
     console.log('Running 7 tests:')
     this.testCreatePointer()
     this.testQuery()
