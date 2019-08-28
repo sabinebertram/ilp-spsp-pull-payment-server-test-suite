@@ -6,6 +6,17 @@ const IlpPlugin = require('ilp-plugin')
 const PullFunctions = require('./pullfunctions')
 const Helpers = require('./helpers')
 
+const defaultAmount = 1
+const defaultInterval = 'PT10S'
+const defaultCycles = 6
+const defaultCap = 'false'
+
+const capTestAmount = 2
+const capTestCap = 'true'
+
+const expiryTestCycles = 2
+const expiryTestCap = 'true'
+
 class PullTestSuite {
   constructor (deps) {
     this.plugin = IlpPlugin()
@@ -25,12 +36,12 @@ class PullTestSuite {
   async testCreatePointer () {
     const testName = 'pointer creation'
     const creation = await this.pull.createPointer({
-      amount: 1,
+      amount: defaultAmount,
       assetCode: this.assetCode,
       assetScale: this.assetScale,
-      interval: 'PT10S',
-      cycles: 6,
-      cap: 'false' })
+      interval: defaultInterval,
+      cycles: defaultCycles,
+      cap: defaultCap })
     if (creation.pointer) {
       this.helpers.success(testName)
     } else {
@@ -41,12 +52,12 @@ class PullTestSuite {
   async testQuery () {
     const testName = 'pointer querying'
     const creation = await this.pull.createPointer({
-      amount: 1,
+      amount: defaultAmount,
       assetCode: this.assetCode,
       assetScale: this.assetScale,
-      interval: 'PT10S',
-      cycles: 6,
-      cap: 'false' })
+      interval: defaultInterval,
+      cycles: defaultCycles,
+      cap: defaultCap })
     if (creation.pointer) {
       try {
         await SPSP.query(creation.pointer)
@@ -62,12 +73,12 @@ class PullTestSuite {
   async testPullMultipleIntervals (n) {
     const testName = `pull ${n} intervals: ${n}*1/10^${this.assetScale} ${this.assetCode}`
     const creation = await this.pull.createPointer({
-      amount: 1,
+      amount: defaultAmount,
       assetCode: this.assetCode,
       assetScale: this.assetScale,
-      interval: 'PT10S',
-      cycles: 6,
-      cap: 'false' })
+      interval: defaultInterval,
+      cycles: defaultCycles,
+      cap: defaultCap })
     if (creation.pointer) {
       if (this.details.clientAddress.startsWith('private') || this.details.clientAddress.startsWith('test') || this.config.productionMode) {
         let pulled = await this.pull.pullMultipleIntervals(creation.pointer, 10, n)
@@ -87,15 +98,15 @@ class PullTestSuite {
   async testPullDifferentCurrency () {
     const testName = 'pull foreign currency'
     const creation = await this.pull.createPointer({
-      amount: 1,
+      amount: defaultAmount,
       assetCode: this.foreignAssetCode,
       assetScale: this.foreignAssetScale,
-      interval: 'PT10S',
-      cycles: 6,
-      cap: 'false' })
+      interval: defaultInterval,
+      cycles: defaultCycles,
+      cap: defaultCap })
     if (creation.pointer) {
       if (this.details.clientAddress.startsWith('private') || this.details.clientAddress.startsWith('test') || this.config.productionMode) {
-        const desiredPullValue = await Exchange.fetchRate(this.foreignAssetCode, 2, this.assetCode, this.assetScale)
+        const desiredPullValue = Math.round(await Exchange.fetchRate(this.foreignAssetCode, 2, this.assetCode, this.assetScale))
         if (desiredPullValue) {
           let pulled = await this.pull.pullMultipleIntervals(creation.pointer, Math.ceil(desiredPullValue), 1)
           if (Number(pulled.totalReceived) === desiredPullValue) {
@@ -117,12 +128,12 @@ class PullTestSuite {
   async testCap () {
     const testName = 'cap'
     const creation = await this.pull.createPointer({
-      amount: 2,
+      amount: capTestAmount,
       assetCode: this.assetCode,
       assetScale: this.assetScale,
-      interval: 'PT10S',
-      cycles: 6,
-      cap: 'true' })
+      interval: defaultInterval,
+      cycles: defaultCycles,
+      cap: capTestCap })
     if (creation.pointer) {
       if (this.details.clientAddress.startsWith('private') || this.details.clientAddress.startsWith('test') || this.config.productionMode) {
         let pulled = await this.pull.pull(creation.pointer, 10)
@@ -144,12 +155,12 @@ class PullTestSuite {
   async testExpiry () {
     const testName = 'no refill after expiry'
     const creation = await this.pull.createPointer({
-      amount: 1,
+      amount: defaultAmount,
       assetCode: this.assetCode,
       assetScale: this.assetScale,
-      interval: 'PT10S',
-      cycles: 2,
-      cap: 'true' })
+      interval: defaultInterval,
+      cycles: expiryTestCycles,
+      cap: expiryTestCap })
     if (creation.pointer) {
       if (this.details.clientAddress.startsWith('private') || this.details.clientAddress.startsWith('test') || this.config.productionMode) {
         let pulled = await this.pull.pullMultipleIntervals(creation.pointer, 10, 3)
