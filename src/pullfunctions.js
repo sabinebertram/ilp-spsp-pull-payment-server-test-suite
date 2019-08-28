@@ -14,12 +14,12 @@ class PullFunctions {
   async createPointer (body) {
     try {
       const response = await axios({
-        url: this.config.url,
+        url: this.config.spspUrl,
         method: 'post',
         data: JSON.stringify(body),
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': 'Bearer ' + this.config.token
+          'Authorization': 'Bearer ' + this.config.spspToken
         }
       })
       return response.data
@@ -42,13 +42,13 @@ class PullFunctions {
     }
   }
 
-  async pullMultipleIntervals (pointer, amount, n) {
+  async pullMultipleIntervals (pointer, amount, intervalCount) {
     const pulled = await this.pull(pointer, amount)
     let totalReceived = Number(pulled.totalReceived)
     if (!totalReceived) {
       return { totalReceived: 0, message: pulled.message }
     } else {
-      for (let i = 1; i < n; i++) {
+      for (let i = 1; i < intervalCount; i++) {
         await this.helpers.sleep(10000)
         let pulled = await this.pull(pointer, amount)
         totalReceived += Number(pulled.totalReceived)

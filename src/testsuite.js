@@ -23,6 +23,7 @@ class PullTestSuite {
     this.assetCode = this.details.assetCode
     this.assetScale = String(this.details.assetScale - 1)
     this.foreignAssetCode = this.assetCode !== 'EUR' ? 'EUR' : 'USD'
+    this.foreignAssetScale = 2
   }
 
   async testCreatePointer () {
@@ -92,7 +93,7 @@ class PullTestSuite {
     const creation = await this.pull.createPointer({
       amount: 1,
       assetCode: this.foreignAssetCode,
-      assetScale: 2,
+      assetScale: this.foreignAssetScale,
       interval: 'PT10S',
       cycles: 6,
       cap: 'false' })
