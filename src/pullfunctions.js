@@ -4,12 +4,16 @@ const SPSP = require('ilp-protocol-spsp')
 const IlpPlugin = require('ilp-plugin')
 
 const Config = require('./config')
-const Helpers = require('./helpers')
 
 class PullFunctions {
   constructor (deps) {
     this.config = deps(Config)
-    this.helpers = deps(Helpers)
+  }
+
+  sleep (ms) {
+    return new Promise(resolve => {
+      setTimeout(resolve, ms)
+    })
   }
 
   async createPointer (body) {
@@ -50,7 +54,7 @@ class PullFunctions {
         totalReceived += Number(pulled.totalReceived)
         i++
         if (i < intervalCount) {
-          await this.helpers.sleep(moment.duration(interval).as('milliseconds'))
+          await this.sleep(moment.duration(interval).as('milliseconds'))
         }
       }
     }
@@ -66,7 +70,7 @@ class PullFunctions {
       } else {
         totalReceived += Number(pulled.totalReceived)
         if (i < amounts.length - 1) {
-          await this.helpers.sleep(moment.duration(interval).as('milliseconds'))
+          await this.sleep(moment.duration(interval).as('milliseconds'))
         }
       }
     }

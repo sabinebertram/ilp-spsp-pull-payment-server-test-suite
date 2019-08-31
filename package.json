@@ -2,9 +2,8 @@
   "name": "ilp-spsp-pull-payment-server-test-suite",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
   "scripts": {
-    "start": "node index.js",
+    "start": "echo \"Error: no main file specified. Only possible to run test.\" && exit 1",
     "test": "jest"
   },
   "author": "Sabine Bertram",
