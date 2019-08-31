@@ -3,15 +3,19 @@ const ILDCP = require('ilp-protocol-ildcp')
 const Exchange = require('ilp-exchange-rate')
 const IlpPlugin = require('ilp-plugin')
 const reduct = require('reduct')
+const moment = require('moment')
 
 const PullFunctions = require('../src/pullfunctions')
-const Helpers = require('../src/helpers')
+
+const productionMode = process.env.PRODUCTION === 'true'
+const defaultInterval = process.env.PULL_POINTER_INTERVAL || 'PT10S'
 
 const defaultAmount = 1
-const defaultInterval = 'PT10S'
-const defaultCycles = 6
+const defaultCycles = 10
 const defaultCap = 'false'
 const foreignAssetScale = 2
+
+let scaleTestScale
 
 const capTestAmount = 2
 const capTestCap = 'true'
@@ -30,8 +34,14 @@ beforeAll(async () => {
   await plugin.connect()
   const details = await ILDCP.fetch(plugin.sendData.bind(plugin))
   assetCode = details.assetCode
-  assetScale = String(details.assetScale - 1)
+  assetScale = String(details.assetScale)
+  scaleTestScale = assetScale - 1
   foreignAssetCode = assetCode !== 'EUR' ? 'EUR' : 'USD'
+
+  if (!details.clientAddress.startsWith('private') && !details.clientAddress.startsWith('test') && !productionMode) {
+    await plugin.disconnect()
+    process.exit(1)
+  }
 })
 
 afterAll(async () => {
@@ -73,8 +83,8 @@ test('Pull once from pull pointer', async () => {
     cycles: defaultCycles,
     cap: defaultCap
   })
-  const pull = await pullFunctions.pullMultipleIntervals(creation.pointer, 10, 1)
-  expect(pull.totalReceived).toBe(10)
+  const pull = await pullFunctions.pullMultipleIntervals(creation.pointer, defaultAmount, defaultInterval, 1)
+  expect(pull.totalReceived).toBe(1)
 })
 
 test('Pull twice from pull pointer', async () => {
@@ -86,9 +96,22 @@ test('Pull twice from pull pointer', async () => {
     cycles: defaultCycles,
     cap: defaultCap
   })
-  const pull = await pullFunctions.pullMultipleIntervals(creation.pointer, 10, 2)
-  expect(pull.totalReceived).toBe(20)
-}, 20000)
+  const pull = await pullFunctions.pullMultipleIntervals(creation.pointer, defaultAmount, defaultInterval, 2)
+  expect(pull.totalReceived).toBe(2)
+}, moment.duration(defaultInterval).as('milliseconds') * 2 + 10000)
+
+test('Pull different asset scale', async () => {
+  const creation = await pullFunctions.createPointer({
+    amount: defaultAmount,
+    assetCode: assetCode,
+    assetScale: scaleTestScale,
+    interval: defaultInterval,
+    cycles: defaultCycles,
+    cap: defaultCap
+  })
+  const pull = await pullFunctions.pullMultipleIntervals(creation.pointer, defaultAmount * 10, defaultInterval, 1)
+  expect(pull.totalReceived).toBe(10)
+})
 
 test('Pull different currency', async () => {
   const creation = await pullFunctions.createPointer({
@@ -100,10 +123,10 @@ test('Pull different currency', async () => {
     cap: defaultCap
   })
   const rate = await Exchange.fetchRate(foreignAssetCode, foreignAssetScale, assetCode, assetScale)
-  const desiredPullValue = Math.ceil(rate * 10)
-  const pull = await pullFunctions.pullMultipleIntervals(creation.pointer, desiredPullValue, 1)
+  const desiredPullValue = Math.ceil(rate)
+  const pull = await pullFunctions.pullMultipleIntervals(creation.pointer, desiredPullValue, defaultInterval, 1)
   expect(pull.totalReceived).toBe(desiredPullValue)
-}, 12000)
+}, moment.duration(defaultInterval).as('milliseconds') + 10000)
 // TODO: does not exit correctly
 
 test('Pull using a cap', async () => {
@@ -115,9 +138,9 @@ test('Pull using a cap', async () => {
     cycles: defaultCycles,
     cap: capTestCap
   })
-  const pull = await pullFunctions.pullMultipleAmounts(creation.pointer, [10, 30])
-  expect(pull.totalReceived).toBe(30)
-}, 25000)
+  const pull = await pullFunctions.pullMultipleAmounts(creation.pointer, [1, 3], defaultInterval)
+  expect(pull.totalReceived).toBe(3)
+}, moment.duration(defaultInterval).as('milliseconds') * 2 + 10000)
 
 test('Pull test expiry', async () => {
   const creation = await pullFunctions.createPointer({
@@ -128,6 +151,6 @@ test('Pull test expiry', async () => {
     cycles: expiryTestCycles,
     cap: expiryTestCap
   })
-  const pull = await pullFunctions.pullMultipleIntervals(creation.pointer, 10, 3)
-  expect(pull.totalReceived).toBe(20)
+  const pull = await pullFunctions.pullMultipleIntervals(creation.pointer, defaultAmount, defaultInterval, 3)
+  expect(pull.totalReceived).toBe(2)
 }, 40000)

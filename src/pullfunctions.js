@@ -1,4 +1,5 @@
 const axios = require('axios')
+const moment = require('moment')
 const SPSP = require('ilp-protocol-spsp')
 const IlpPlugin = require('ilp-plugin')
 
@@ -38,7 +39,7 @@ class PullFunctions {
     }
   }
 
-  async pullMultipleIntervals (pointer, amount, intervalCount) {
+  async pullMultipleIntervals (pointer, amount, interval, intervalCount) {
     let totalReceived = 0
     let i = 0
     while (i < intervalCount) {
@@ -49,14 +50,14 @@ class PullFunctions {
         totalReceived += Number(pulled.totalReceived)
         i++
         if (i < intervalCount) {
-          await this.helpers.sleep(10000)
+          await this.helpers.sleep(moment.duration(interval).as('milliseconds'))
         }
       }
     }
     return { totalReceived }
   }
 
-  async pullMultipleAmounts (pointer, amounts) {
+  async pullMultipleAmounts (pointer, amounts, interval) {
     let totalReceived = 0
     for (let i = 0; i < amounts.length; i++) {
       const pulled = await this.pull(pointer, amounts[i])
@@ -65,7 +66,7 @@ class PullFunctions {
       } else {
         totalReceived += Number(pulled.totalReceived)
         if (i < amounts.length - 1) {
-          await this.helpers.sleep(10000)
+          await this.helpers.sleep(moment.duration(interval).as('milliseconds'))
         }
       }
     }
