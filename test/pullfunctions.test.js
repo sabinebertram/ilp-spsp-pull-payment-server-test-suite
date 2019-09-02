@@ -142,7 +142,7 @@ test('Pull using a cap', async () => {
   expect(pull.totalReceived).toBe(3)
 }, moment.duration(defaultInterval).as('milliseconds') * 2 + 10000)
 
-test('Pull test expiry', async () => {
+test('Pull after expiry', async () => {
   const creation = await pullFunctions.createPointer({
     amount: defaultAmount,
     assetCode: assetCode,
