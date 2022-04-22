@@ -1,0 +1,26 @@
+{
+  "name": "ilp-spsp-pull-payment-server-test-suite",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "start": "echo \"Error: no main file specified. Only possible to run test.\" && exit 1",
+    "test": "jest"
+  },
+  "author": "Sabine Bertram",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "axios": "^0.19.0",
+    "chalk": "^2.4.2",
+    "ilp-exchange-rate": "^0.1.1",
+    "ilp-plugin": "^3.3.1",
+    "ilp-protocol-ildcp": "^2.0.1",
+    "ilp-protocol-spsp": "^3.0.0",
+    "jest": "^24.9.0",
+    "log-symbols": "^3.0.0",
+    "moment": "^2.24.0",
+    "reduct": "^3.3.1"
+  },
+  "devDependencies": {
+    "standard": "^12.0.1"
+  }
+}
